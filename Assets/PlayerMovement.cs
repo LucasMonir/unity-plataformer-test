@@ -1,28 +1,20 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor.ShaderKeywordFilter;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
     Rigidbody2D rb;
     Animator animator;
-    float moveForce = 2;
-    SpriteRenderer spr;
-    float jumpForce = 5;
+    readonly float moveForce = 2;
+    readonly float jumpForce = 5;
     bool facingRight = true;
+    public GameObject platform;
 
-    // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        spr = GetComponent<SpriteRenderer>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         HandleMovement();
@@ -73,5 +65,21 @@ public class PlayerMovement : MonoBehaviour
         rb.transform.localScale = currentScale;
 
         facingRight = !facingRight;
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "Spawn")
+        {
+            System.Random rn = new System.Random();
+            float distance = rn.Next(5, 8);
+            float height = rn.Next(-4, 3);
+
+            Vector3 position = transform.position;
+            position.x = distance;
+            position.y = height;
+            Instantiate(platform, new Vector3(transform.position.x + distance, height, 0), Quaternion.identity);
+            Destroy(collision.gameObject);
+        }
     }
 }
